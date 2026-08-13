@@ -9,6 +9,7 @@
   --mono: "SF Mono", "JetBrains Mono", "Menlo", "Consolas", monospace;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto, Helvetica, Arial, sans-serif;
   --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --sidebar-w: 320px;
 }
 
 * {
@@ -22,7 +23,7 @@ html {
 body {
   margin: 0;
   background:
-    radial-gradient(1200px 600px at 50% -10%, rgba(255, 255, 255, 0.55), transparent 70%),
+    radial-gradient(1400px 700px at 20% -10%, rgba(255, 255, 255, 0.6), transparent 70%),
     var(--paper);
   color: var(--ink);
   font-family: var(--sans);
@@ -44,37 +45,56 @@ a:hover {
   text-decoration-color: var(--accent);
 }
 
-.masthead {
+.layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+/* ---------- Sidebar ---------- */
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  padding: 72px 24px 40px;
+  justify-content: center;
+  gap: 28px;
+  padding: 40px 28px;
+  border-right: 1px solid var(--rule);
+  background: var(--paper-deep);
 }
 
 .face {
-  margin: 0 0 28px;
+  margin: 0;
   font-family: var(--mono);
-  font-size: 15px;
-  line-height: 1.12;
+  font-size: 11px;
+  line-height: 1.18;
   letter-spacing: 0;
   color: var(--ink);
   white-space: pre;
   user-select: none;
+  text-align: center;
+}
+
+.identity {
+  text-align: center;
 }
 
 .name {
   margin: 0;
   font-family: var(--serif);
-  font-size: clamp(2.2rem, 6vw, 3.5rem);
+  font-size: 1.55rem;
   font-weight: 500;
   letter-spacing: 0;
-  line-height: 1.05;
+  line-height: 1.1;
 }
 
 .subtitle {
-  margin: 12px 0 0;
-  font-size: 1.05rem;
+  margin: 10px 0 0;
+  font-size: 0.86rem;
   color: var(--ink-soft);
 }
 
@@ -84,13 +104,12 @@ a:hover {
 
 .nav {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 22px;
-  margin-top: 26px;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   font-family: var(--mono);
-  font-size: 0.8rem;
-  letter-spacing: 0.04em;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -103,23 +122,26 @@ a:hover {
   color: var(--accent);
 }
 
-main {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 0 24px;
+/* ---------- Content ---------- */
+
+.content {
+  min-width: 0;
+  max-width: 820px;
+  padding: 72px 56px;
 }
 
 .section {
-  padding: 40px 0 12px;
-  border-top: 1px solid var(--rule);
+  padding: 0 0 40px;
+  margin-bottom: 8px;
 }
 
-.section:first-of-type {
-  border-top: none;
+.section + .section {
+  border-top: 1px solid var(--rule);
+  padding-top: 40px;
 }
 
 .label {
-  margin: 0 0 24px;
+  margin: 0 0 26px;
   font-family: var(--mono);
   font-size: 0.72rem;
   font-weight: 500;
@@ -129,7 +151,7 @@ main {
 }
 
 .sub-label {
-  margin: 0 0 14px;
+  margin: 32px 0 14px;
   font-family: var(--mono);
   font-size: 0.76rem;
   font-weight: 500;
@@ -137,15 +159,20 @@ main {
   color: var(--ink-soft);
 }
 
-.projects,
-.articles {
+.sub-label:first-of-type {
+  margin-top: 0;
+}
+
+/* ---------- Projects ---------- */
+
+.projects {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
 .project {
-  padding: 20px 0;
+  padding: 22px 0;
   border-top: 1px solid var(--rule);
 }
 
@@ -154,65 +181,87 @@ main {
   padding-top: 0;
 }
 
-.project-title {
-  display: inline-flex;
+.project-head {
+  display: flex;
   align-items: baseline;
-  gap: 10px;
-  font-size: 1.12rem;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.project-title {
+  font-size: 1.15rem;
   font-weight: 600;
   text-decoration: none;
 }
 
-.project-title .meta {
+.project-lang {
   font-family: var(--mono);
   font-size: 0.68rem;
-  font-weight: 400;
   letter-spacing: 0.05em;
   color: var(--ink-faint);
   text-transform: uppercase;
 }
 
-.project-desc {
-  margin: 8px 0 0;
-  max-width: 60ch;
+.metrics {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+.metric {
   color: var(--ink-soft);
-  font-size: 0.96rem;
 }
 
-.writing-col {
-  margin-bottom: 24px;
+.project-desc {
+  margin: 10px 0 0;
+  max-width: 62ch;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
 }
 
-.articles li {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  padding: 10px 0;
-  border-top: 1px solid var(--rule);
+/* ---------- Writing ---------- */
+
+.article {
+  padding: 18px 0;
 }
 
-.articles li:first-child {
-  border-top: none;
-  padding-top: 0;
-}
-
-.articles a {
+.article-title {
+  font-size: 1.1rem;
+  font-weight: 600;
   text-decoration: none;
-  font-size: 1rem;
+}
+
+.article-desc {
+  margin: 8px 0 0;
+  max-width: 62ch;
+  color: var(--ink-soft);
+  font-size: 0.94rem;
 }
 
 .article-meta {
-  margin-left: auto;
+  margin: 10px 0 0;
   font-family: var(--mono);
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   color: var(--ink-faint);
-  white-space: nowrap;
+}
+
+.article-meta .sep {
+  color: var(--ink-faint);
+  padding: 0 2px;
 }
 
 .placeholder {
   color: var(--ink-faint);
   font-style: italic;
+  margin: 0;
 }
+
+/* ---------- Experience ---------- */
 
 .exp {
   padding: 20px 0;
@@ -250,10 +299,12 @@ main {
 
 .exp-desc {
   margin: 6px 0 0;
-  max-width: 60ch;
+  max-width: 62ch;
   color: var(--ink-soft);
   font-size: 0.94rem;
 }
+
+/* ---------- Footer ---------- */
 
 .footer {
   display: flex;
@@ -261,9 +312,8 @@ main {
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
-  max-width: 720px;
-  margin: 48px auto 0;
-  padding: 24px;
+  margin-top: 40px;
+  padding-top: 22px;
   border-top: 1px solid var(--rule);
   font-family: var(--mono);
   font-size: 0.72rem;
@@ -279,21 +329,33 @@ main {
   color: var(--accent);
 }
 
-@media (max-width: 480px) {
-  .masthead {
-    padding-top: 56px;
+/* ---------- Responsive ---------- */
+
+@media (max-width: 760px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    flex-direction: column;
+    gap: 20px;
+    padding: 48px 24px 40px;
+    border-right: none;
+    border-bottom: 1px solid var(--rule);
   }
 
   .face {
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .nav {
-    gap: 14px;
+    flex-direction: row;
+    gap: 18px;
   }
 
-  .exp-head {
-    flex-direction: column;
-    gap: 2px;
+  .content {
+    padding: 48px 24px 56px;
   }
 }

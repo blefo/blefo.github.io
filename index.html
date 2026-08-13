@@ -11,108 +11,136 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="masthead">
-      <pre id="face" class="face" aria-label="ASCII portrait"></pre>
-      <h1 class="name">Baptiste Lefort</h1>
-      <p class="subtitle">AI Engineer <span class="sep">&middot;</span> AI for cybersecurity</p>
-      <nav class="nav" aria-label="Primary">
-        <a href="https://github.com/blefo" rel="noopener">GitHub</a>
-        <a href="https://medium.com/@baptistelefort" rel="noopener">Medium</a>
-        <a href="#writing" class="anchor">Writing</a>
-        <a href="mailto:lefort.baptiste@yahoo.fr">Email</a>
-      </nav>
-    </header>
+    <div class="layout">
+      <aside class="sidebar">
+        <pre id="face" class="face" aria-label="ASCII portrait that follows the cursor"></pre>
+        <div class="identity">
+          <h1 class="name">Baptiste Lefort</h1>
+          <p class="subtitle">AI Engineer <span class="sep">&middot;</span> AI for cybersecurity</p>
+        </div>
+        <nav class="nav" aria-label="Primary">
+          <a href="https://github.com/blefo" rel="noopener">GitHub</a>
+          <a href="https://medium.com/@baptistelefort" rel="noopener">Medium</a>
+          <a href="mailto:lefort.baptiste@yahoo.fr">Email</a>
+        </nav>
+      </aside>
 
-    <main>
-      <section id="work" class="section">
-        <h2 class="label">Selected projects</h2>
-        <ul class="projects">
-          <li class="project">
-            <a href="https://github.com/blefo/FSRLearning" rel="noopener" class="project-title">
-              FSRLearning <span class="meta">Python</span>
-            </a>
-            <p class="project-desc">
-              The first feature-selection method based on reinforcement learning, shipped as a pip-installable Python library.
-            </p>
-          </li>
-          <li class="project">
-            <a href="https://github.com/NillionNetwork/nilAI" rel="noopener" class="project-title">
-              nilAI <span class="meta">Python</span>
-            </a>
-            <p class="project-desc">
-              Core offering of Nillion SecretLLM, a TEE-based private AI inference service.
-            </p>
-          </li>
-          <li class="project">
-            <a href="https://github.com/blefo/typofast" rel="noopener" class="project-title">
-              typofast <span class="meta">Swift</span>
-            </a>
-            <p class="project-desc">
-              Ultra-fast, on-device typing completion for macOS on llama.cpp — low latency, high throughput.
-            </p>
-          </li>
-          <li class="project">
-            <a href="https://github.com/blefo/FastInference" rel="noopener" class="project-title">
-              FastInference <span class="meta">Python</span>
-            </a>
-            <p class="project-desc">
-              One clean interface to query top LLM APIs quickly, robustly, and at scale.
-            </p>
-          </li>
-        </ul>
-      </section>
-
-      <section id="writing" class="section">
-        <h2 class="label">Writing</h2>
-        <div class="writing-col">
-          <h3 class="sub-label">Medium</h3>
-          <ul class="articles">
-            <li>
-              <a
-                href="https://medium.com/data-science/reinforcement-learning-for-feature-selection-be1e7eeb0acc"
-                rel="noopener"
-              >
-                Reinforcement Learning for Feature Selection
-              </a>
-              <span class="article-meta">Medium &middot; May 2024</span>
+      <main class="content">
+        <section id="projects" class="section">
+          <h2 class="label">Selected projects</h2>
+          <ul class="projects">
+            <li class="project">
+              <div class="project-head">
+                <a href="https://github.com/blefo/FSRLearning" rel="noopener" class="project-title">
+                  FSRLearning
+                </a>
+                <span class="project-lang">Python</span>
+                <span class="metrics">
+                  <span class="metric" title="GitHub stars">★ 25</span>
+                  <span class="metric" title="PyPI total downloads">3k downloads</span>
+                </span>
+              </div>
+              <p class="project-desc">
+                The first feature-selection method based on reinforcement learning, shipped as a pip-installable Python library.
+              </p>
             </li>
-            <!-- More Medium posts will be added here. -->
+            <li class="project">
+              <div class="project-head">
+                <a href="https://github.com/NillionNetwork/nilAI" rel="noopener" class="project-title">
+                  nilAI
+                </a>
+                <span class="project-lang">Python</span>
+                <span class="metrics">
+                  <span class="metric" title="GitHub stars">★ 31</span>
+                </span>
+              </div>
+              <p class="project-desc">
+                Core offering of Nillion SecretLLM, a TEE-based private AI inference service.
+              </p>
+            </li>
+            <li class="project">
+              <div class="project-head">
+                <a href="https://github.com/blefo/typofast" rel="noopener" class="project-title">
+                  typofast
+                </a>
+                <span class="project-lang">Swift</span>
+                <span class="metrics">
+                  <span class="metric" title="GitHub stars">★ 6</span>
+                </span>
+              </div>
+              <p class="project-desc">
+                Ultra-fast, on-device typing completion for macOS on llama.cpp — low latency, high throughput.
+              </p>
+            </li>
+            <li class="project">
+              <div class="project-head">
+                <a href="https://github.com/blefo/FastInference" rel="noopener" class="project-title">
+                  FastInference
+                </a>
+                <span class="project-lang">Python</span>
+                <span class="metrics">
+                  <span class="metric" title="GitHub stars">★ 0</span>
+                  <span class="metric" title="PyPI total downloads">5k downloads</span>
+                </span>
+              </div>
+              <p class="project-desc">
+                One clean interface to query top LLM APIs quickly, robustly, and at scale.
+              </p>
+            </li>
           </ul>
-        </div>
-        <div class="writing-col">
+        </section>
+
+        <section id="writing" class="section">
+          <h2 class="label">Writing</h2>
+
+          <h3 class="sub-label">Medium</h3>
+          <article class="article">
+            <a
+              class="article-title"
+              href="https://medium.com/data-science/reinforcement-learning-for-feature-selection-be1e7eeb0acc"
+              rel="noopener"
+            >
+              Reinforcement Learning for Feature Selection
+            </a>
+            <p class="article-desc">
+              Select efficiently the features for your machine learning models with reinforcement learning.
+            </p>
+            <p class="article-meta">
+              Towards Data Science <span class="sep">&middot;</span> May 2024
+              <span class="sep">&middot;</span> 11 min read
+            </p>
+          </article>
+
           <h3 class="sub-label">Substack</h3>
-          <ul class="articles">
-            <li class="placeholder">Substack posts will be added here.</li>
-            <!-- Substack posts will be added here. -->
-          </ul>
-        </div>
-      </section>
+          <p class="placeholder">Newsletter coming soon.</p>
+        </section>
 
-      <section id="experience" class="section">
-        <h2 class="label">Experience</h2>
-        <div class="exp">
-          <div class="exp-head">
-            <span class="exp-role">Recent role</span>
-            <span class="exp-date">Dates</span>
+        <section id="experience" class="section">
+          <h2 class="label">Experience</h2>
+          <div class="exp">
+            <div class="exp-head">
+              <span class="exp-role">Recent role</span>
+              <span class="exp-date">Dates</span>
+            </div>
+            <p class="exp-org">Company</p>
+            <p class="exp-desc">One-line summary of what you did.</p>
           </div>
-          <p class="exp-org">Company</p>
-          <p class="exp-desc">One-line summary of what you did.</p>
-        </div>
-        <div class="exp">
-          <div class="exp-head">
-            <span class="exp-role">Previous role</span>
-            <span class="exp-date">Dates</span>
+          <div class="exp">
+            <div class="exp-head">
+              <span class="exp-role">Previous role</span>
+              <span class="exp-date">Dates</span>
+            </div>
+            <p class="exp-org">Company</p>
+            <p class="exp-desc">One-line summary of what you did.</p>
           </div>
-          <p class="exp-org">Company</p>
-          <p class="exp-desc">One-line summary of what you did.</p>
-        </div>
-      </section>
-    </main>
+        </section>
 
-    <footer class="footer">
-      <span>&copy; 2026 Baptiste Lefort</span>
-      <a href="https://github.com/blefo" rel="noopener">github.com/blefo</a>
-    </footer>
+        <footer class="footer">
+          <span>&copy; 2026 Baptiste Lefort</span>
+          <a href="https://github.com/blefo" rel="noopener">github.com/blefo</a>
+        </footer>
+      </main>
+    </div>
 
     <script src="app.js" defer></script>
   </body>
