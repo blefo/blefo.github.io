@@ -53,7 +53,7 @@ a:hover {
 .canvas {
   position: relative;
   min-height: 100vh;
-  padding: 56px 40px 72px;
+  padding: 56px 40px 96px;
   max-width: 1320px;
   margin: 0 auto;
 }
@@ -64,7 +64,7 @@ a:hover {
   grid-template-areas:
     "face projects writing"
     "identity projects experience"
-    "nav publications footer";
+    "nav publications publications";
   gap: 26px;
   align-items: start;
 }
@@ -95,10 +95,6 @@ a:hover {
 
 .drag-item[data-drag-id="publications"] {
   grid-area: publications;
-}
-
-.drag-item[data-drag-id="footer"] {
-  grid-area: footer;
 }
 
 .canvas.measuring .drag-item {
@@ -197,13 +193,6 @@ a:hover {
   --post-border: #7dbb62;
   --post-shadow: rgba(90, 160, 70, 0.3);
   --tilt: -0.6deg;
-}
-
-.drag-item[data-drag-id="footer"] {
-  --post-bg: #f1efe4;
-  --post-border: #b8b093;
-  --post-shadow: rgba(120, 110, 80, 0.28);
-  --tilt: 0.5deg;
 }
 
 .drag-item:nth-child(2n) {
@@ -571,25 +560,35 @@ a:hover {
 
 /* ---------- Footer ---------- */
 
-.footer {
+.page-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
-  padding: 20px 26px;
+  gap: 8px;
+  padding: 12px 16px 16px;
   font-family: var(--mono);
   font-size: 0.7rem;
   color: var(--ink-faint);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.78) 55%, #ffffff 100%);
 }
 
-.footer a {
+.page-footer a {
   color: var(--ink-faint);
   text-decoration: none;
 }
 
-.footer a:hover {
+.page-footer a:hover {
   color: var(--accent);
+}
+
+.footer-sep {
+  padding: 0 2px;
 }
 
 /* ---------- Responsive ---------- */
@@ -601,8 +600,7 @@ a:hover {
       "face projects"
       "identity writing"
       "nav experience"
-      "publications publications"
-      "footer footer";
+      "publications publications";
   }
 }
 
@@ -610,7 +608,7 @@ a:hover {
   .canvas,
   .canvas:not(.js-positioned) {
     display: block;
-    padding: 16px;
+    padding: 16px 16px 84px;
   }
 
   .canvas.js-positioned .drag-item {
