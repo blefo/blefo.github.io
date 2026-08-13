@@ -37,6 +37,10 @@
   }
 
   function renderPhotoFace(pupilLX, pupilLY, pupilRX, pupilRY) {
+    if (!faceArt.eyes || !faceArt.eyes.length) {
+      return faceArt.lines.join("\n");
+    }
+
     var grid = faceArt.lines.map(function (line) {
       return line.split("");
     });
