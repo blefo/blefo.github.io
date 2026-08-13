@@ -163,15 +163,16 @@
 (function () {
   "use strict";
 
-  if (window.matchMedia("(max-width: 760px)").matches) return;
-
   var canvas = document.getElementById("canvas");
   var items = Array.prototype.slice.call(document.querySelectorAll(".drag-item"));
+  var resetBtn = document.getElementById("reset-layout");
   if (!canvas || !items.length) return;
 
   var STORAGE_KEY = "bl-portfolio-layout-v1";
+  var isMobile = window.matchMedia("(max-width: 760px)").matches;
   var saved = {};
   var state = {};
+  var defaults = {};
 
   try {
     saved = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "{}") || {};
@@ -216,6 +217,40 @@
     });
   }
 
+  function resetLayout() {
+    try {
+      window.localStorage.removeItem(STORAGE_KEY);
+    } catch (err) {
+      // Clearing persistence is best-effort; the visible layout still resets.
+    }
+
+    if (isMobile || !canvas.classList.contains("js-positioned")) return;
+
+    items.forEach(function (el) {
+      var id = el.dataset.dragId;
+      var d = defaults[id];
+      if (!d) return;
+      state[id] = { x: d.x, y: d.y, w: d.w, h: d.h };
+      el.style.width = d.w + "px";
+      el.style.left = d.x + "px";
+      el.style.top = d.y + "px";
+      el.classList.remove("settle");
+      void el.offsetWidth;
+      el.classList.add("settle");
+      window.setTimeout(function () {
+        el.classList.remove("settle");
+      }, 620);
+    });
+    updateHeight();
+    save();
+  }
+
+  if (resetBtn) {
+    resetBtn.addEventListener("click", resetLayout);
+  }
+
+  if (isMobile) return;
+
   function initPositions() {
     canvas.classList.add("measuring");
     window.requestAnimationFrame(function () {
@@ -226,12 +261,14 @@
       items.forEach(function (el) {
         var id = el.dataset.dragId;
         var box = el.getBoundingClientRect();
-        state[id] = {
+        var measured = {
           x: Math.round(box.left - rect.left - padLeft),
           y: Math.round(box.top - rect.top - padTop),
           w: Math.round(box.width),
           h: Math.round(box.height)
         };
+        state[id] = measured;
+        defaults[id] = { x: measured.x, y: measured.y, w: measured.w, h: measured.h };
       });
 
       canvas.classList.remove("measuring");
