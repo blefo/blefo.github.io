@@ -172,6 +172,7 @@
   var saved = {};
   var state = {};
   var defaults = {};
+  var zTop = 1000;
 
   try {
     saved = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "{}") || {};
@@ -195,7 +196,15 @@
     var out = {};
     items.forEach(function (el) {
       var s = state[el.dataset.dragId];
-      if (s) out[el.dataset.dragId] = { x: s.x, y: s.y, w: s.w, h: s.h };
+      if (s) {
+        out[el.dataset.dragId] = {
+          x: s.x,
+          y: s.y,
+          w: s.w,
+          h: s.h,
+          z: parseInt(el.style.zIndex, 10) || 0
+        };
+      }
     });
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(out));
@@ -233,7 +242,7 @@
 
     if (isMobile || !canvas.classList.contains("js-positioned")) return;
 
-    items.forEach(function (el) {
+    items.forEach(function (el, index) {
       var id = el.dataset.dragId;
       var d = defaults[id];
       if (!d) return;
@@ -241,6 +250,7 @@
       el.style.width = d.w + "px";
       el.style.left = d.x + "px";
       el.style.top = d.y + "px";
+      el.style.zIndex = String(index + 2);
       el.classList.remove("settle");
       void el.offsetWidth;
       el.classList.add("settle");
@@ -248,6 +258,7 @@
         el.classList.remove("settle");
       }, 620);
     });
+    zTop = 1000;
     updateHeight();
   }
 
@@ -287,7 +298,12 @@
         el.style.width = s.w + "px";
         el.style.left = s.x + "px";
         el.style.top = s.y + "px";
-        el.style.zIndex = String(index + 2);
+        var z = index + 2;
+        if (prior && prior.z) {
+          z = Math.max(z, parseInt(prior.z, 10) || 0);
+        }
+        el.style.zIndex = String(z);
+        zTop = Math.max(zTop, z + 1);
       });
 
       updateHeight();
@@ -362,7 +378,7 @@
           dragging = true;
           moved = true;
           el.classList.add("is-dragging");
-          el.style.zIndex = "1000";
+          el.style.zIndex = String(zTop++);
           try {
             el.setPointerCapture(pointerId);
           } catch (err) {
@@ -409,7 +425,6 @@
 
         if (dragging) {
           el.classList.remove("is-dragging");
-          el.style.zIndex = String(baseZ);
           el.classList.add("settle");
           window.setTimeout(function () {
             el.classList.remove("settle");
