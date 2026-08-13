@@ -12,6 +12,14 @@
   </head>
   <body>
     <div id="canvas" class="canvas">
+      <button id="reset-layout" class="reset-layout" type="button" aria-label="Reset layout to the original positions">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+          <path d="M3 3v5h5" />
+        </svg>
+        Reset layout
+      </button>
+
       <section class="drag-item face-card" data-drag-id="face" aria-label="ASCII portrait that follows the cursor">
         <pre id="face" class="face"></pre>
       </section>
@@ -167,124 +175,73 @@
 
       <section id="publications" class="drag-item section" data-drag-id="publications">
         <h2 class="label">Publications</h2>
-        <p class="paper-note">
-          Google Scholar metrics as of Aug 13, 2026. These venues do not publish public download counters.
-        </p>
         <ul class="papers">
           <li class="paper">
-            <div class="paper-head">
-              <a
-                class="paper-title"
-                href="https://arxiv.org/abs/2401.05447"
-                rel="noopener"
-              >
-                Can ChatGPT Compute Trustworthy Sentiment Scores from Bloomberg Market Wraps?
-              </a>
-              <span class="paper-stats">
-                <span class="paper-stat" title="Google Scholar, Aug 13 2026">Cited by 13</span>
-                <span class="paper-stat muted" title="No public download counter found on arXiv, SSRN, HAL, or IEEE">Downloads n/a</span>
-              </span>
-            </div>
+            <a
+              class="paper-title"
+              href="https://arxiv.org/abs/2401.05447"
+              rel="noopener"
+            >
+              Can ChatGPT Compute Trustworthy Sentiment Scores from Bloomberg Market Wraps?
+            </a>
             <p class="paper-venue">
               arXiv:2401.05447 <span class="sep">&middot;</span> 2024
-              <span class="sep">&middot;</span>
-              <a href="https://doi.org/10.1109/ICDMW65004.2024.00021" rel="noopener">IEEE ICDMW workshop paper</a>
-            </p>
-            <p class="paper-talk">
-              Presented at IEEE ICDMW 2024, Abu Dhabi, United Arab Emirates.
+              <span class="sep">&middot;</span> Presented at IEEE ICDMW 2024, Abu Dhabi
             </p>
           </li>
 
           <li class="paper">
-            <div class="paper-head">
-              <a
-                class="paper-title"
-                href="https://link.springer.com/chapter/10.1007/978-3-032-25314-9_5"
-                rel="noopener"
-              >
-                Optimizing Performance: How Compact Models Match or Exceed GPT's Classification Capabilities Through Fine-Tuning
-              </a>
-              <span class="paper-stats">
-                <span class="paper-stat" title="Google Scholar, Aug 13 2026; 12 across Scholar variants">Cited by 12</span>
-                <span class="paper-stat muted" title="No public download counter found on Springer or arXiv">Downloads n/a</span>
-              </span>
-            </div>
+            <a
+              class="paper-title"
+              href="https://link.springer.com/chapter/10.1007/978-3-032-25314-9_5"
+              rel="noopener"
+            >
+              Optimizing Performance: How Compact Models Match or Exceed GPT's Classification Capabilities Through Fine-Tuning
+            </a>
             <p class="paper-venue">
-              ECML PKDD 2024 Workshops <span class="sep">&middot;</span> Springer CCIS <span class="sep">&middot;</span> 2024
-              <span class="sep">&middot;</span>
-              <a href="https://doi.org/10.1007/978-3-032-25314-9_5" rel="noopener">DOI</a>
-            </p>
-            <p class="paper-talk">
-              Presented at ECML PKDD 2024, Vilnius, Lithuania.
+              ECML PKDD 2024 <span class="sep">&middot;</span> Springer <span class="sep">&middot;</span> 2024
+              <span class="sep">&middot;</span> Presented in Vilnius, Lithuania
             </p>
           </li>
 
           <li class="paper">
-            <div class="paper-head">
-              <a
-                class="paper-title"
-                href="https://arxiv.org/abs/2409.00094"
-                rel="noopener"
-              >
-                Examining Independence in Ensemble Sentiment Analysis: A Study on the Limits of Large Language Models Using the Condorcet Jury Theorem
-              </a>
-              <span class="paper-stats">
-                <span class="paper-stat" title="Google Scholar, Aug 13 2026">Cited by 6</span>
-                <span class="paper-stat muted" title="No public download counter found on arXiv">Downloads n/a</span>
-              </span>
-            </div>
+            <a
+              class="paper-title"
+              href="https://arxiv.org/abs/2409.00094"
+              rel="noopener"
+            >
+              Examining Independence in Ensemble Sentiment Analysis: A Study on the Limits of Large Language Models Using the Condorcet Jury Theorem
+            </a>
             <p class="paper-venue">
               arXiv:2409.00094 <span class="sep">&middot;</span> 2024
-              <span class="sep">&middot;</span>
-              <a href="https://doi.org/10.48550/arXiv.2409.00094" rel="noopener">DOI</a>
             </p>
-            <p class="paper-talk">No conference presentation found.</p>
           </li>
 
           <li class="paper">
-            <div class="paper-head">
-              <a
-                class="paper-title"
-                href="https://link.springer.com/chapter/10.1007/978-3-032-25314-9_6"
-                rel="noopener"
-              >
-                Stress Index Strategy Enhanced with Financial News Sentiment Analysis for the Equity Markets
-              </a>
-              <span class="paper-stats">
-                <span class="paper-stat" title="Google Scholar, Aug 13 2026; 4 across Scholar variants">Cited by 4</span>
-                <span class="paper-stat muted" title="No public download counter found on Springer">Downloads n/a</span>
-              </span>
-            </div>
+            <a
+              class="paper-title"
+              href="https://link.springer.com/chapter/10.1007/978-3-032-25314-9_6"
+              rel="noopener"
+            >
+              Stress Index Strategy Enhanced with Financial News Sentiment Analysis for the Equity Markets
+            </a>
             <p class="paper-venue">
-              ECML PKDD 2024 Workshops <span class="sep">&middot;</span> Springer CCIS <span class="sep">&middot;</span> 2024
-              <span class="sep">&middot;</span>
-              <a href="https://doi.org/10.1007/978-3-032-25314-9_6" rel="noopener">DOI</a>
-            </p>
-            <p class="paper-talk">
-              Presented at ECML PKDD 2024, Vilnius, Lithuania.
+              ECML PKDD 2024 <span class="sep">&middot;</span> Springer <span class="sep">&middot;</span> 2024
+              <span class="sep">&middot;</span> Presented in Vilnius, Lithuania
             </p>
           </li>
 
           <li class="paper">
-            <div class="paper-head">
-              <a
-                class="paper-title"
-                href="https://arxiv.org/abs/2507.22932"
-                rel="noopener"
-              >
-                FinMarBa: A Market-Informed Dataset for Financial Sentiment Classification
-              </a>
-              <span class="paper-stats">
-                <span class="paper-stat" title="Google Scholar, Aug 13 2026">Cited by 2</span>
-                <span class="paper-stat muted" title="No public download counter found on arXiv or SSRN">Downloads n/a</span>
-              </span>
-            </div>
+            <a
+              class="paper-title"
+              href="https://arxiv.org/abs/2507.22932"
+              rel="noopener"
+            >
+              FinMarBa: A Market-Informed Dataset for Financial Sentiment Classification
+            </a>
             <p class="paper-venue">
               arXiv:2507.22932 <span class="sep">&middot;</span> 2025
-              <span class="sep">&middot;</span>
-              <a href="https://doi.org/10.48550/arXiv.2507.22932" rel="noopener">DOI</a>
             </p>
-            <p class="paper-talk">No conference presentation found.</p>
           </li>
         </ul>
       </section>
@@ -315,7 +272,7 @@
       </footer>
     </div>
 
-    <script src="face-art.js" defer></script>
+    <script src="face-art-v2.js" defer></script>
     <script src="app.js" defer></script>
   </body>
 </html>
