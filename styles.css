@@ -235,6 +235,10 @@ a:hover {
   animation: shake-hit 380ms ease-in-out 1;
 }
 
+.canvas.shake-hit .drag-item {
+  animation: shake-hit 380ms ease-in-out 1;
+}
+
 @keyframes idle-bob {
   from {
     transform: translateY(0);

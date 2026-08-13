@@ -167,7 +167,7 @@
   var items = Array.prototype.slice.call(document.querySelectorAll(".drag-item"));
   if (!canvas || !items.length) return;
 
-  var STORAGE_KEY = "bl-portfolio-layout-v2";
+  var STORAGE_KEY = "bl-portfolio-layout-v4";
   var isMobile = window.matchMedia("(max-width: 760px)").matches;
   var saved = {};
   var state = {};
@@ -177,6 +177,14 @@
     saved = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "{}") || {};
   } catch (err) {
     saved = {};
+  }
+
+  try {
+    window.localStorage.removeItem("bl-portfolio-layout-v1");
+    window.localStorage.removeItem("bl-portfolio-layout-v2");
+    window.localStorage.removeItem("bl-portfolio-layout-v3");
+  } catch (err) {
+    // Legacy layout keys are best-effort cleanup.
   }
 
   function clamp(value, min, max) {
@@ -249,15 +257,13 @@
     canvas.classList.add("measuring");
     window.requestAnimationFrame(function () {
       var rect = canvas.getBoundingClientRect();
-      var padLeft = parseFloat(window.getComputedStyle(canvas).paddingLeft) || 0;
-      var padTop = parseFloat(window.getComputedStyle(canvas).paddingTop) || 0;
 
       items.forEach(function (el) {
         var id = el.dataset.dragId;
         var box = el.getBoundingClientRect();
         var measured = {
-          x: Math.round(box.left - rect.left - padLeft),
-          y: Math.round(box.top - rect.top - padTop),
+          x: Math.round(box.left - rect.left),
+          y: Math.round(box.top - rect.top),
           w: Math.round(box.width),
           h: Math.round(box.height)
         };
@@ -390,9 +396,8 @@
           shake.lastY = s.y;
         }
 
-        var farFromStart = Math.abs(s.x - originX) + Math.abs(s.y - originY) < 240;
-        var quickEnough = performance.now() - shake.startedAt < 1800;
-        if (shake.reversals >= 4 && shake.path >= 120 && quickEnough && farFromStart) {
+        var quickEnough = performance.now() - shake.startedAt < 2500;
+        if (shake.reversals >= 3 && shake.path >= 90 && quickEnough) {
           cancelDrag();
         }
       }
@@ -431,7 +436,7 @@
   items.forEach(attachDrag);
   initPositions();
 
-  // Also recognize a shake made over a tile without holding the mouse button.
+  // Recognize a shake made anywhere over the page without holding the mouse button.
   var hoverShake = null;
 
   window.addEventListener("pointermove", function (e) {
@@ -442,14 +447,8 @@
 
     var target = document.elementFromPoint(e.clientX, e.clientY);
     var tile = target && target.closest ? target.closest(".drag-item") : null;
-    if (!tile) {
-      hoverShake = null;
-      return;
-    }
-
-    if (!hoverShake || hoverShake.el !== tile) {
+    if (!hoverShake) {
       hoverShake = {
-        el: tile,
         dirX: 0,
         dirY: 0,
         reversals: 0,
@@ -482,16 +481,21 @@
     }
 
     var displacement = Math.abs(e.clientX - hoverShake.startedX) + Math.abs(e.clientY - hoverShake.startedY);
-    var quickEnough = performance.now() - hoverShake.startedAt < 1300;
+    var quickEnough = performance.now() - hoverShake.startedAt < 1500;
     if (
-      hoverShake.reversals >= 4 &&
-      hoverShake.path >= 100 &&
-      displacement < 140 &&
+      hoverShake.reversals >= 3 &&
+      hoverShake.path >= 80 &&
+      displacement < 160 &&
       quickEnough
     ) {
-      tile.classList.add("shake-hit");
+      if (tile) {
+        tile.classList.add("shake-hit");
+      } else {
+        canvas.classList.add("shake-hit");
+      }
       window.setTimeout(function () {
-        tile.classList.remove("shake-hit");
+        if (tile) tile.classList.remove("shake-hit");
+        canvas.classList.remove("shake-hit");
       }, 700);
       hoverShake = null;
       resetLayout();
