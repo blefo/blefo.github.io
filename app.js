@@ -167,18 +167,9 @@
   var items = Array.prototype.slice.call(document.querySelectorAll(".drag-item"));
   if (!canvas || !items.length) return;
 
-  var STORAGE_KEY = "bl-portfolio-layout-v6";
   var isMobile = window.matchMedia("(max-width: 760px)").matches;
-  var saved = {};
   var state = {};
-  var defaults = {};
   var zTop = 1000;
-
-  try {
-    saved = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "{}") || {};
-  } catch (err) {
-    saved = {};
-  }
 
   try {
     window.localStorage.removeItem("bl-portfolio-layout-v1");
@@ -186,35 +177,13 @@
     window.localStorage.removeItem("bl-portfolio-layout-v3");
     window.localStorage.removeItem("bl-portfolio-layout-v4");
     window.localStorage.removeItem("bl-portfolio-layout-v5");
+    window.localStorage.removeItem("bl-portfolio-layout-v6");
   } catch (err) {
     // Legacy layout keys are best-effort cleanup.
   }
 
   function clamp(value, min, max) {
     return Math.max(min, Math.min(value, max));
-  }
-
-  function save() {
-    var out = {};
-    items.forEach(function (el) {
-      var s = state[el.dataset.dragId];
-      if (s) {
-        out[el.dataset.dragId] = {
-          x: s.x,
-          y: s.y,
-          w: s.w,
-          h: s.h,
-          ver: 2,
-          vw: window.innerWidth,
-          z: parseInt(el.style.zIndex, 10) || 0
-        };
-      }
-    });
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(out));
-    } catch (err) {
-      // Layout persistence is best-effort; dragging still works in-memory.
-    }
   }
 
   function updateHeight() {
@@ -238,35 +207,27 @@
   }
 
   function resetLayout() {
-    try {
-      window.localStorage.removeItem(STORAGE_KEY);
-    } catch (err) {
-      // Clearing persistence is best-effort; the visible layout still resets.
-    }
-
     if (isMobile || !canvas.classList.contains("js-positioned")) return;
 
-    items.forEach(function (el, index) {
-      var id = el.dataset.dragId;
-      var d = defaults[id];
-      if (!d) return;
-      state[id] = { x: d.x, y: d.y, w: d.w, h: d.h };
-      el.style.width = d.w + "px";
-      el.style.left = d.x + "px";
-      el.style.top = d.y + "px";
-      el.style.zIndex = String(index + 2);
-      el.classList.remove("settle");
-      void el.offsetWidth;
-      el.classList.add("settle");
-      window.setTimeout(function () {
-        el.classList.remove("settle");
-      }, 620);
-    });
-    zTop = 1000;
-    updateHeight();
+    scatter();
   }
 
   if (isMobile) return;
+
+  function scatter() {
+    items.forEach(function (el) {
+      var id = el.dataset.dragId;
+      var s = state[id];
+      if (!s) return;
+      s.x = Math.round(Math.random() * Math.max(0, canvas.clientWidth - s.w));
+      s.y = Math.round(Math.random() * Math.max(0, canvas.clientHeight - s.h));
+      el.style.left = s.x + "px";
+      el.style.top = s.y + "px";
+    });
+    updateHeight();
+    clampAll();
+    updateHeight();
+  }
 
   function initPositions() {
     canvas.classList.add("measuring");
@@ -283,7 +244,6 @@
           h: Math.round(box.height)
         };
         state[id] = measured;
-        defaults[id] = { x: measured.x, y: measured.y, w: measured.w, h: measured.h };
       });
 
       canvas.classList.remove("measuring");
@@ -292,29 +252,14 @@
       items.forEach(function (el, index) {
         var id = el.dataset.dragId;
         var s = state[id];
-        var prior = saved[id];
-        var changed = !prior || prior.ver !== 2 || Math.abs(prior.vw - window.innerWidth) > 2;
-        if (prior && !changed) {
-          s.x = prior.x;
-          s.y = prior.y;
-          s.w = prior.w;
-          s.h = prior.h;
-        }
         el.style.width = s.w + "px";
         el.style.left = s.x + "px";
         el.style.top = s.y + "px";
-        var z = index + 2;
-        if (prior && prior.z) {
-          z = Math.max(z, parseInt(prior.z, 10) || 0);
-        }
-        el.style.zIndex = String(z);
-        zTop = Math.max(zTop, z + 1);
+        el.style.zIndex = String(index + 2);
       });
 
-      updateHeight();
-      clampAll();
-      updateHeight();
-      save();
+      zTop = 1000;
+      scatter();
     });
   }
 
@@ -436,7 +381,6 @@
           }, 620);
           clampAll();
           updateHeight();
-          save();
         }
 
         if (moved) {
