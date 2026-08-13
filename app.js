@@ -165,7 +165,6 @@
 
   var canvas = document.getElementById("canvas");
   var items = Array.prototype.slice.call(document.querySelectorAll(".drag-item"));
-  var resetBtn = document.getElementById("reset-layout");
   if (!canvas || !items.length) return;
 
   var STORAGE_KEY = "bl-portfolio-layout-v1";
@@ -242,11 +241,6 @@
       }, 620);
     });
     updateHeight();
-    save();
-  }
-
-  if (resetBtn) {
-    resetBtn.addEventListener("click", resetLayout);
   }
 
   if (isMobile) return;
@@ -326,6 +320,33 @@
       var pointerId = e.pointerId;
       var dragging = false;
       var moved = false;
+      var shake = {
+        dirX: 0,
+        dirY: 0,
+        reversals: 0,
+        lastX: s.x,
+        lastY: s.y,
+        path: 0,
+        startedAt: performance.now()
+      };
+
+      function cancelDrag() {
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+        window.removeEventListener("pointercancel", onUp);
+        el.classList.remove("is-dragging");
+        el.style.zIndex = String(baseZ);
+        try {
+          el.releasePointerCapture(pointerId);
+        } catch (err) {
+          // Pointer capture may already have been released.
+        }
+        suppressClick = true;
+        window.setTimeout(function () {
+          suppressClick = false;
+        }, 80);
+        resetLayout();
+      }
 
       function onMove(ev) {
         var dx = ev.clientX - startX;
@@ -350,6 +371,30 @@
         el.style.left = s.x + "px";
         el.style.top = s.y + "px";
         updateHeight();
+
+        var segX = s.x - shake.lastX;
+        var segY = s.y - shake.lastY;
+        shake.path += Math.abs(segX) + Math.abs(segY);
+
+        if (Math.abs(segX) >= 9) {
+          var dirX = segX > 0 ? 1 : -1;
+          if (shake.dirX !== 0 && dirX !== shake.dirX) shake.reversals += 1;
+          shake.dirX = dirX;
+          shake.lastX = s.x;
+        }
+
+        if (Math.abs(segY) >= 9) {
+          var dirY = segY > 0 ? 1 : -1;
+          if (shake.dirY !== 0 && dirY !== shake.dirY) shake.reversals += 1;
+          shake.dirY = dirY;
+          shake.lastY = s.y;
+        }
+
+        var farFromStart = Math.abs(s.x - originX) + Math.abs(s.y - originY) < 240;
+        var quickEnough = performance.now() - shake.startedAt < 1400;
+        if (shake.reversals >= 4 && shake.path >= 160 && quickEnough && farFromStart) {
+          cancelDrag();
+        }
       }
 
       function onUp() {
