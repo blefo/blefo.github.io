@@ -53,7 +53,7 @@ a:hover {
 .canvas {
   position: relative;
   min-height: 100vh;
-  padding: 26px;
+  padding: 56px 40px 72px;
   max-width: 1320px;
   margin: 0 auto;
 }
@@ -65,7 +65,7 @@ a:hover {
     "face projects writing"
     "identity projects experience"
     "nav publications footer";
-  gap: 22px;
+  gap: 26px;
   align-items: start;
 }
 
@@ -121,7 +121,7 @@ a:hover {
   border: 1.5px dashed var(--post-border, var(--rule));
   border-radius: 3px;
   box-shadow: 0 10px 22px -14px var(--post-shadow, rgba(70, 60, 40, 0.35));
-  padding: 22px 24px;
+  padding: 28px 30px 24px;
   cursor: grab;
   user-select: none;
   -webkit-user-select: none;
@@ -287,7 +287,7 @@ a:hover {
 /* ---------- Identity cards ---------- */
 
 .face-card {
-  padding: 18px 20px 14px;
+  padding: 22px 22px 18px;
 }
 
 .face {
@@ -337,7 +337,7 @@ a:hover {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 14px 20px;
+  padding: 18px 22px;
   font-family: var(--mono);
   font-size: 0.72rem;
 }
@@ -365,11 +365,11 @@ a:hover {
 /* ---------- Sections ---------- */
 
 .section {
-  padding: 22px 24px 18px;
+  padding: 26px 28px 22px;
 }
 
 .label {
-  margin: 0 0 14px;
+  margin: 0 0 18px;
   font-family: var(--mono);
   font-size: 0.72rem;
   font-weight: 500;
@@ -399,7 +399,7 @@ a:hover {
 }
 
 .project {
-  padding: 9px 0;
+  padding: 13px 0;
   border-top: 1px solid var(--rule);
 }
 
@@ -453,7 +453,7 @@ a:hover {
 /* ---------- Writing ---------- */
 
 .article {
-  padding: 10px 0;
+  padding: 13px 0;
 }
 
 .article-title {
@@ -496,7 +496,7 @@ a:hover {
 }
 
 .paper {
-  padding: 9px 0;
+  padding: 13px 0;
   border-top: 1px solid var(--rule);
 }
 
@@ -525,7 +525,7 @@ a:hover {
 /* ---------- Experience ---------- */
 
 .exp {
-  padding: 10px 0;
+  padding: 13px 0;
   border-top: 1px solid var(--rule);
 }
 
@@ -573,7 +573,7 @@ a:hover {
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
-  padding: 16px 22px;
+  padding: 20px 26px;
   font-family: var(--mono);
   font-size: 0.7rem;
   color: var(--ink-faint);

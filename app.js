@@ -167,7 +167,7 @@
   var items = Array.prototype.slice.call(document.querySelectorAll(".drag-item"));
   if (!canvas || !items.length) return;
 
-  var STORAGE_KEY = "bl-portfolio-layout-v1";
+  var STORAGE_KEY = "bl-portfolio-layout-v2";
   var isMobile = window.matchMedia("(max-width: 760px)").matches;
   var saved = {};
   var state = {};
