@@ -1,9 +1,65 @@
 (function () {
   "use strict";
 
-  // A human face drawn with ASCII. Each pupil moves in a 3x3 socket interior,
-  // so both eyes can look up/down and left/right to follow the cursor.
+  var faceArt = window.FACE_ART || null;
+
+  function drawEye(grid, cx, cy, px, py) {
+    if (cy < 1 || cy + 1 >= grid.length) return;
+
+    for (var dy = -1; dy <= 1; dy++) {
+      for (var dx = -2; dx <= 2; dx++) {
+        var y = cy + dy;
+        var x = cx + dx;
+        if (y >= 0 && y < grid.length && x >= 0 && x < grid[y].length) {
+          grid[y][x] = " ";
+        }
+      }
+    }
+
+    function put(y, x, s) {
+      if (y < 0 || y >= grid.length) return;
+      var row = grid[y];
+      for (var i = 0; i < s.length; i++) {
+        var col = x + i;
+        if (col >= 0 && col < row.length) row[col] = s[i];
+      }
+    }
+
+    put(cy - 1, cx - 2, "(   )");
+    put(cy, cx - 2, "(   )");
+    put(cy + 1, cx - 2, "(   )");
+
+    var pupilRow = cy - 1 + Math.max(-1, Math.min(1, py - 1));
+    var pupilCol = cx - 1 + Math.max(-1, Math.min(1, px - 1));
+    if (pupilRow >= 0 && pupilRow < grid.length && pupilCol >= 0 && pupilCol < grid[pupilRow].length) {
+      grid[pupilRow][pupilCol] = "o";
+    }
+  }
+
+  function renderPhotoFace(pupilLX, pupilLY, pupilRX, pupilRY) {
+    var grid = faceArt.lines.map(function (line) {
+      return line.split("");
+    });
+    var eyes = faceArt.eyes || [];
+    for (var i = 0; i < eyes.length; i++) {
+      var eye = eyes[i];
+      var px = i === 0 ? pupilLX : pupilRX;
+      var py = i === 0 ? pupilLY : pupilRY;
+      drawEye(grid, eye.x, eye.y, px, py);
+    }
+    return grid
+      .map(function (row) {
+        return row.join("").replace(/\s+$/, "");
+      })
+      .join("\n");
+  }
+
+  // Fallback portrait used when the generated face-art file is not loaded.
   function renderFace(pupilLX, pupilLY, pupilRX, pupilRY) {
+    if (faceArt && faceArt.lines && faceArt.lines.length) {
+      return renderPhotoFace(pupilLX, pupilLY, pupilRX, pupilRY);
+    }
+
     var W = 40;
     var H = 15;
     var g = [];
