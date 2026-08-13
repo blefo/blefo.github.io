@@ -125,8 +125,30 @@ func imagePoint(_ normalized: CGPoint) -> CGPoint {
     return CGPoint(x: x - CGFloat(cropX0), y: yTop - CGFloat(cropY0))
 }
 
-let leftEye = imagePoint(normalizedEyePoint(face.landmarks?.leftEye) ?? CGPoint(x: 0.35, y: 0.42))
-let rightEye = imagePoint(normalizedEyePoint(face.landmarks?.rightEye) ?? CGPoint(x: 0.65, y: 0.42))
+func landmarkPoints(_ region: VNFaceLandmarkRegion2D?) -> [[String: CGFloat]] {
+    guard let points = region?.normalizedPoints else { return [] }
+    return points.map { point in
+        let p = imagePoint(point)
+        return ["x": p.x, "y": p.y]
+    }
+}
+
+func landmarkMidpoint(_ region: VNFaceLandmarkRegion2D?) -> CGPoint? {
+    guard let points = region?.normalizedPoints, !points.isEmpty else { return nil }
+    var x: CGFloat = 0
+    var y: CGFloat = 0
+    for point in points {
+        x += point.x
+        y += point.y
+    }
+    return imagePoint(CGPoint(x: x / CGFloat(points.count), y: y / CGFloat(points.count)))
+}
+
+let landmarks = face.landmarks
+let leftEye = imagePoint(normalizedEyePoint(landmarks?.leftEye) ?? CGPoint(x: 0.35, y: 0.42))
+let rightEye = imagePoint(normalizedEyePoint(landmarks?.rightEye) ?? CGPoint(x: 0.65, y: 0.42))
+let nose = landmarkMidpoint(landmarks?.nose) ?? imagePoint(CGPoint(x: 0.5, y: 0.58))
+let mouth = landmarkMidpoint(landmarks?.outerLips) ?? imagePoint(CGPoint(x: 0.5, y: 0.72))
 
 var output = [UInt8](repeating: 0, count: cropW * cropH * 4)
 for dy in 0..<cropH {
@@ -167,6 +189,16 @@ let metadata: [String: Any] = [
     "eyes": [
         ["name": "left", "x": leftEye.x, "y": leftEye.y],
         ["name": "right", "x": rightEye.x, "y": rightEye.y]
+    ],
+    "landmarks": [
+        "leftEye": ["x": leftEye.x, "y": leftEye.y],
+        "rightEye": ["x": rightEye.x, "y": rightEye.y],
+        "nose": ["x": nose.x, "y": nose.y],
+        "mouth": ["x": mouth.x, "y": mouth.y],
+        "leftEyebrow": landmarkPoints(landmarks?.leftEyebrow),
+        "rightEyebrow": landmarkPoints(landmarks?.rightEyebrow),
+        "faceContour": landmarkPoints(landmarks?.faceContour),
+        "outerLips": landmarkPoints(landmarks?.outerLips)
     ]
 ]
 
