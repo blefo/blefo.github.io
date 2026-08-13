@@ -109,6 +109,19 @@ a:hover {
   rotate: var(--tilt, -1.1deg);
 }
 
+.canvas:not(.js-positioned) .drag-item {
+  width: auto !important;
+  left: auto !important;
+  top: auto !important;
+  margin: 0;
+}
+
+.canvas.is-clean + .page-footer {
+  position: static;
+  background: transparent;
+  padding: 8px 16px 28px;
+}
+
 /* ---------- Draggable cards ---------- */
 
 .drag-item {

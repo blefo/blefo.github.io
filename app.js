@@ -207,10 +207,48 @@
     });
   }
 
-  function resetLayout() {
+  function cleanLayout() {
     if (isMobile || !canvas.classList.contains("js-positioned")) return;
 
-    scatter();
+    canvas.style.height = "";
+    canvas.classList.remove("js-positioned");
+    canvas.classList.add("is-clean");
+  }
+
+  // Re-enter the draggable, absolutely positioned mode from the tidy grid
+  // layout so a card can be picked up and moved right after a clean.
+  function activatePositions() {
+    if (canvas.classList.contains("js-positioned")) return;
+
+    canvas.classList.add("measuring");
+    var rect = canvas.getBoundingClientRect();
+
+    items.forEach(function (el) {
+      var id = el.dataset.dragId;
+      var box = el.getBoundingClientRect();
+      state[id] = {
+        x: Math.round(box.left - rect.left),
+        y: Math.round(box.top - rect.top),
+        w: Math.round(box.width),
+        h: Math.round(box.height)
+      };
+    });
+
+    canvas.classList.remove("measuring");
+    canvas.classList.add("js-positioned");
+    canvas.classList.remove("is-clean");
+
+    items.forEach(function (el, index) {
+      var id = el.dataset.dragId;
+      var s = state[id];
+      el.style.width = s.w + "px";
+      el.style.left = s.x + "px";
+      el.style.top = s.y + "px";
+      el.style.zIndex = String(index + 2);
+    });
+
+    zTop = 1000;
+    updateHeight();
   }
 
   if (isMobile) return;
@@ -341,6 +379,7 @@
 
     el.addEventListener("pointerdown", function (e) {
       if (e.pointerType === "mouse" && e.button !== 0) return;
+      activatePositions();
       var s = state[id];
       if (!s) return;
 
@@ -376,7 +415,7 @@
         window.setTimeout(function () {
           suppressClick = false;
         }, 80);
-        resetLayout();
+        cleanLayout();
       }
 
       function onMove(ev) {
@@ -521,11 +560,12 @@
         canvas.classList.remove("shake-hit");
       }, 700);
       hoverShake = null;
-      resetLayout();
+      cleanLayout();
     }
   });
 
   window.addEventListener("resize", function () {
+    if (!canvas.classList.contains("js-positioned")) return;
     clampAll();
     updateHeight();
   });
