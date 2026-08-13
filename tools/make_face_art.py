@@ -650,6 +650,28 @@ def render_hybrid(image, meta, cols, rows, symmetric):
     return lines, [{"x": left_eye[0], "y": eye_row}, {"x": right_eye[0], "y": eye_row}]
 
 
+def crop_payload(lines, eyes, pad=0):
+    """Trim blank margins so the portrait fills its card without empty space."""
+    xs = []
+    ys = []
+    for y, line in enumerate(lines):
+        for x, ch in enumerate(line):
+            if ch != " ":
+                xs.append(x)
+                ys.append(y)
+    if not xs:
+        return lines, eyes
+
+    x0 = max(0, min(xs) - pad)
+    x1 = min(max(xs) + pad, max(len(line) for line in lines) - 1)
+    y0 = max(0, min(ys) - pad)
+    y1 = min(max(ys) + pad, len(lines) - 1)
+
+    cropped = [line[x0:x1 + 1].rstrip() for line in lines[y0:y1 + 1]]
+    shifted = [{"x": eye["x"] - x0, "y": eye["y"] - y0} for eye in eyes]
+    return cropped, shifted
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("image")
@@ -663,6 +685,7 @@ def main() -> None:
     )
     parser.add_argument("--outline", choices=["#", "+", "="], default="#")
     parser.add_argument("--sym", action="store_true")
+    parser.add_argument("--crop", action="store_true", help="trim blank margins around the portrait")
     args = parser.parse_args()
 
     image = Image.open(args.image).convert("RGBA")
@@ -685,6 +708,9 @@ def main() -> None:
         lines, eyes = render_hybrid(image, meta, cols, rows, args.sym)
     else:
         lines, eyes = render_stylized(image, meta, cols, rows, args.sym)
+
+    if args.crop:
+        lines, eyes = crop_payload(lines, eyes)
 
     payload = {"lines": lines, "eyes": eyes}
     Path(args.output).write_text("window.FACE_ART = " + json.dumps(payload) + ";\n", encoding="utf-8")
