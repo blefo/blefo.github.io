@@ -376,14 +376,14 @@
         var segY = s.y - shake.lastY;
         shake.path += Math.abs(segX) + Math.abs(segY);
 
-        if (Math.abs(segX) >= 9) {
+        if (Math.abs(segX) >= 6) {
           var dirX = segX > 0 ? 1 : -1;
           if (shake.dirX !== 0 && dirX !== shake.dirX) shake.reversals += 1;
           shake.dirX = dirX;
           shake.lastX = s.x;
         }
 
-        if (Math.abs(segY) >= 9) {
+        if (Math.abs(segY) >= 6) {
           var dirY = segY > 0 ? 1 : -1;
           if (shake.dirY !== 0 && dirY !== shake.dirY) shake.reversals += 1;
           shake.dirY = dirY;
@@ -391,8 +391,8 @@
         }
 
         var farFromStart = Math.abs(s.x - originX) + Math.abs(s.y - originY) < 240;
-        var quickEnough = performance.now() - shake.startedAt < 1400;
-        if (shake.reversals >= 4 && shake.path >= 160 && quickEnough && farFromStart) {
+        var quickEnough = performance.now() - shake.startedAt < 1800;
+        if (shake.reversals >= 4 && shake.path >= 120 && quickEnough && farFromStart) {
           cancelDrag();
         }
       }
@@ -430,6 +430,73 @@
 
   items.forEach(attachDrag);
   initPositions();
+
+  // Also recognize a shake made over a tile without holding the mouse button.
+  var hoverShake = null;
+
+  window.addEventListener("pointermove", function (e) {
+    if (document.querySelector(".drag-item.is-dragging")) {
+      hoverShake = null;
+      return;
+    }
+
+    var target = document.elementFromPoint(e.clientX, e.clientY);
+    var tile = target && target.closest ? target.closest(".drag-item") : null;
+    if (!tile) {
+      hoverShake = null;
+      return;
+    }
+
+    if (!hoverShake || hoverShake.el !== tile) {
+      hoverShake = {
+        el: tile,
+        dirX: 0,
+        dirY: 0,
+        reversals: 0,
+        lastX: e.clientX,
+        lastY: e.clientY,
+        path: 0,
+        startedAt: performance.now(),
+        startedX: e.clientX,
+        startedY: e.clientY
+      };
+      return;
+    }
+
+    var segX = e.clientX - hoverShake.lastX;
+    var segY = e.clientY - hoverShake.lastY;
+    hoverShake.path += Math.abs(segX) + Math.abs(segY);
+
+    if (Math.abs(segX) >= 6) {
+      var dirX = segX > 0 ? 1 : -1;
+      if (hoverShake.dirX !== 0 && dirX !== hoverShake.dirX) hoverShake.reversals += 1;
+      hoverShake.dirX = dirX;
+      hoverShake.lastX = e.clientX;
+    }
+
+    if (Math.abs(segY) >= 6) {
+      var dirY = segY > 0 ? 1 : -1;
+      if (hoverShake.dirY !== 0 && dirY !== hoverShake.dirY) hoverShake.reversals += 1;
+      hoverShake.dirY = dirY;
+      hoverShake.lastY = e.clientY;
+    }
+
+    var displacement = Math.abs(e.clientX - hoverShake.startedX) + Math.abs(e.clientY - hoverShake.startedY);
+    var quickEnough = performance.now() - hoverShake.startedAt < 1300;
+    if (
+      hoverShake.reversals >= 4 &&
+      hoverShake.path >= 100 &&
+      displacement < 140 &&
+      quickEnough
+    ) {
+      tile.classList.add("shake-hit");
+      window.setTimeout(function () {
+        tile.classList.remove("shake-hit");
+      }, 700);
+      hoverShake = null;
+      resetLayout();
+    }
+  });
 
   window.addEventListener("resize", function () {
     clampAll();

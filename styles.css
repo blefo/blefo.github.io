@@ -231,12 +231,35 @@ a:hover {
   animation: settle-bounce 560ms cubic-bezier(0.34, 1.56, 0.64, 1) 1;
 }
 
+.drag-item.shake-hit {
+  animation: shake-hit 380ms ease-in-out 1;
+}
+
 @keyframes idle-bob {
   from {
     transform: translateY(0);
   }
   to {
     transform: translateY(-4px);
+  }
+}
+
+@keyframes shake-hit {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-6px);
+  }
+  40% {
+    transform: translateX(6px);
+  }
+  60% {
+    transform: translateX(-4px);
+  }
+  80% {
+    transform: translateX(4px);
   }
 }
 
