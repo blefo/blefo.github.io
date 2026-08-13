@@ -167,7 +167,7 @@
   var items = Array.prototype.slice.call(document.querySelectorAll(".drag-item"));
   if (!canvas || !items.length) return;
 
-  var STORAGE_KEY = "bl-portfolio-layout-v4";
+  var STORAGE_KEY = "bl-portfolio-layout-v6";
   var isMobile = window.matchMedia("(max-width: 760px)").matches;
   var saved = {};
   var state = {};
@@ -184,6 +184,8 @@
     window.localStorage.removeItem("bl-portfolio-layout-v1");
     window.localStorage.removeItem("bl-portfolio-layout-v2");
     window.localStorage.removeItem("bl-portfolio-layout-v3");
+    window.localStorage.removeItem("bl-portfolio-layout-v4");
+    window.localStorage.removeItem("bl-portfolio-layout-v5");
   } catch (err) {
     // Legacy layout keys are best-effort cleanup.
   }
@@ -202,6 +204,7 @@
           y: s.y,
           w: s.w,
           h: s.h,
+          ver: 2,
           vw: window.innerWidth,
           z: parseInt(el.style.zIndex, 10) || 0
         };
@@ -290,7 +293,7 @@
         var id = el.dataset.dragId;
         var s = state[id];
         var prior = saved[id];
-        var changed = prior && prior.vw && Math.abs(prior.vw - window.innerWidth) > 2;
+        var changed = !prior || prior.ver !== 2 || Math.abs(prior.vw - window.innerWidth) > 2;
         if (prior && !changed) {
           s.x = prior.x;
           s.y = prior.y;
