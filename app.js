@@ -202,6 +202,7 @@
           y: s.y,
           w: s.w,
           h: s.h,
+          vw: window.innerWidth,
           z: parseInt(el.style.zIndex, 10) || 0
         };
       }
@@ -289,7 +290,8 @@
         var id = el.dataset.dragId;
         var s = state[id];
         var prior = saved[id];
-        if (prior) {
+        var changed = prior && prior.vw && Math.abs(prior.vw - window.innerWidth) > 2;
+        if (prior && !changed) {
           s.x = prior.x;
           s.y = prior.y;
           s.w = prior.w;
