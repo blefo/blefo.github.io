@@ -170,6 +170,7 @@
   var isMobile = window.matchMedia("(max-width: 760px)").matches;
   var state = {};
   var zTop = 1000;
+  var tileGap = 28;
 
   try {
     window.localStorage.removeItem("bl-portfolio-layout-v1");
@@ -215,17 +216,75 @@
   if (isMobile) return;
 
   function scatter() {
-    items.forEach(function (el) {
+    var placed = [];
+    var order = items.slice();
+    for (var i = order.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = order[i];
+      order[i] = order[j];
+      order[j] = tmp;
+    }
+
+    order.forEach(function (el) {
       var id = el.dataset.dragId;
       var s = state[id];
       if (!s) return;
-      s.x = Math.round(Math.random() * Math.max(0, canvas.clientWidth - s.w));
-      s.y = Math.round(Math.random() * Math.max(0, canvas.clientHeight - s.h));
+
+      var best = null;
+      var bestScore = Infinity;
+      var attempts = 80;
+      var maxX = Math.max(0, canvas.clientWidth - s.w);
+      var maxY = Math.max(0, canvas.clientHeight - s.h);
+
+      for (var attempt = 0; attempt < attempts; attempt++) {
+        var candidate = {
+          x: Math.round(Math.random() * maxX),
+          y: Math.round(Math.random() * maxY)
+        };
+        var score = 0;
+
+        for (var k = 0; k < placed.length; k++) {
+          var p = placed[k];
+          var overlapX =
+            Math.min(candidate.x + s.w + tileGap, p.x + p.w + tileGap) -
+            Math.max(candidate.x - tileGap, p.x - tileGap);
+          var overlapY =
+            Math.min(candidate.y + s.h + tileGap, p.y + p.h + tileGap) -
+            Math.max(candidate.y - tileGap, p.y - tileGap);
+          if (overlapX > 0 && overlapY > 0) {
+            score += (overlapX + tileGap) * (overlapY + tileGap);
+          }
+        }
+
+        if (score === 0) {
+          best = candidate;
+          break;
+        }
+        if (score < bestScore) {
+          bestScore = score;
+          best = candidate;
+        }
+      }
+
+      if (!best || bestScore > 0) {
+        var bottom = 0;
+        for (var pIdx = 0; pIdx < placed.length; pIdx++) {
+          bottom = Math.max(bottom, placed[pIdx].y + placed[pIdx].h);
+        }
+        best = {
+          x: Math.round(Math.random() * maxX),
+          y: Math.max(0, bottom + tileGap)
+        };
+      }
+
+      s.x = best.x;
+      s.y = best.y;
       el.style.left = s.x + "px";
       el.style.top = s.y + "px";
+      placed.push({ x: s.x, y: s.y, w: s.w, h: s.h });
+      updateHeight();
     });
-    updateHeight();
-    clampAll();
+
     updateHeight();
   }
 
