@@ -422,36 +422,39 @@ def render_portrait(image, meta, cols, rows, symmetric):
     mouth = to_grid(landmarks["mouth"], image_width, image_height, cols, rows)
     eye_row = round((left_eye[1] + right_eye[1]) / 2)
     feature_center_x = round((left_eye[0] + right_eye[0]) / 2)
-    hair_bottom = max(0, eye_row - 7)
+    hair_bottom = max(0, eye_row - 8)
 
     grid = [[" " for _ in range(cols)] for _ in range(rows)]
 
     # Rounded hair cap with a lighter fringe, shaped by the photo luminance.
+    base_half = max(6, round((face_right - face_left) / 2) + 2)
     for y in range(hair_bottom + 1):
-        for x in range(cols):
-            if alpha[y][x] < 96:
-                continue
-            if x < face_left - 2 or x > face_right + 2:
-                continue
-            if gray[y][x] < 135:
-                grid[y][x] = "#"
-            elif y == hair_bottom and gray[y][x] < 205:
-                grid[y][x] = "="
+        taper = 1 - (y / max(1, hair_bottom + 1)) * 0.14
+        half = max(3, round(base_half * taper))
+        for x in range(face_center_x - half, face_center_x + half + 1):
+            if 0 <= x < cols and alpha[y][x] >= 96:
+                grid[y][x] = "#" if y < hair_bottom else "="
 
     # Face outline in lighter line-art characters.
-    for y in range(face_top, face_bottom + 1):
-        left_x = face_left + round((y - face_top) / max(1, face_bottom - face_top) * 2)
-        right_x = face_right - round((y - face_top) / max(1, face_bottom - face_top) * 2)
+    jaw_squeeze = 0.08
+    for y in range(hair_bottom + 1, face_bottom + 1):
+        progress = (y - hair_bottom) / max(1, face_bottom - hair_bottom)
+        squeeze = round(progress * progress * (face_right - face_left) * jaw_squeeze)
+        left_x = max(0, face_left + squeeze)
+        right_x = min(cols - 1, face_right - squeeze)
         if y < eye_row - 1:
-            ch = "/"
+            ch_l = "/"
+            ch_r = "\\"
         elif y < eye_row + 4:
-            ch = "|"
+            ch_l = "|"
+            ch_r = "|"
         else:
-            ch = "\\"
+            ch_l = "\\"
+            ch_r = "/"
         if 0 <= left_x < cols:
-            grid[y][left_x] = ch
+            grid[y][left_x] = ch_l
         if 0 <= right_x < cols:
-            grid[y][right_x] = "\\" if ch == "/" else ("|" if ch == "|" else "/")
+            grid[y][right_x] = ch_r
 
     # Light stubble along the jaw and cheeks.
     for y in range(eye_row + 5, face_bottom - 1):
@@ -555,6 +558,98 @@ def render_equalized(image, meta, cols, rows, symmetric):
     return lines, [{"x": eye[0], "y": eye[1]} for eye in (left_eye, right_eye)]
 
 
+def render_hybrid(image, meta, cols, rows, symmetric):
+    image_width, image_height = image.size
+    landmarks = meta["landmarks"]
+    contour = [(p["x"], p["y"]) for p in landmarks["faceContour"]]
+    face_top = min(y for _, y in contour)
+    face_bottom = max(y for _, y in contour)
+    face_left = min(x for x, _ in contour)
+    face_right = max(x for x, _ in contour)
+    head_polygon = contour + [(face_right, 0), (face_left, 0)]
+
+    head_mask = Image.new("L", (image_width, image_height), 0)
+    ImageDraw.Draw(head_mask).polygon([(x, y) for x, y in head_polygon], fill=255)
+    canvas = Image.new("RGBA", image.size, (246, 240, 228, 255))
+    canvas.alpha_composite(image)
+    canvas.putalpha(head_mask)
+    composite = Image.new("RGBA", image.size, (246, 240, 228, 255))
+    composite.alpha_composite(canvas)
+    gray = composite.convert("L").filter(ImageFilter.MedianFilter(3))
+    equalized = ImageOps.equalize(gray).filter(ImageFilter.GaussianBlur(0.8))
+    small = equalized.resize((cols, rows), Image.Resampling.LANCZOS)
+    alpha = head_mask.resize((cols, rows), Image.Resampling.LANCZOS)
+
+    left_eye = to_grid(meta["eyes"][0], image_width, image_height, cols, rows)
+    right_eye = to_grid(meta["eyes"][1], image_width, image_height, cols, rows)
+    eye_row = round((left_eye[1] + right_eye[1]) / 2)
+    face_left_g = min(x for x, _ in [to_grid(p, image_width, image_height, cols, rows) for p in landmarks["faceContour"]])
+    face_right_g = max(x for x, _ in [to_grid(p, image_width, image_height, cols, rows) for p in landmarks["faceContour"]])
+    face_center_g = round((face_left_g + face_right_g) / 2)
+    hair_bottom = max(0, eye_row - 6)
+
+    ramp = " .:-=+*#%@"
+    grid = [[" " for _ in range(cols)] for _ in range(rows)]
+    for y in range(rows):
+        for x in range(cols):
+            if alpha.getpixel((x, y)) < 96:
+                continue
+            lum = small.getpixel((x, y))
+            grid[y][x] = ramp[min(len(ramp) - 1, lum * len(ramp) // 256)]
+
+    if symmetric:
+        for y in range(rows):
+            for x in range(cols // 2):
+                mx = cols - 1 - x
+                if grid[y][x] != " " and grid[y][mx] != " ":
+                    grid[y][x] = grid[y][mx] = (
+                        grid[y][x] if ramp.index(grid[y][x]) <= ramp.index(grid[y][mx]) else grid[y][mx]
+                    )
+
+    # Rounded hair cap so the portrait reads as a human head.
+    for y in range(hair_bottom + 1):
+        taper = 1 - y / max(1, hair_bottom + 1) * 0.22
+        half = max(2, round((face_right_g - face_left_g) / 2 * taper))
+        for x in range(face_center_g - half, face_center_g + half + 1):
+            if 0 <= x < cols and alpha.getpixel((x, y)) >= 96:
+                grid[y][x] = "#"
+
+    # Face contour below the hairline, mirrored for symmetry.
+    scratch = [[" " for _ in range(cols)] for _ in range(rows)]
+    contour_g = [to_grid(p, image_width, image_height, cols, rows) for p in landmarks["faceContour"]]
+    for i in range(len(contour_g) - 1):
+        x0, y0 = contour_g[i]
+        x1, y1 = contour_g[i + 1]
+        if y0 >= hair_bottom and y1 >= hair_bottom:
+            draw_line(scratch, x0, y0, x1, y1, "#")
+    for y in range(rows):
+        for x in range(cols):
+            if scratch[y][x] == " ":
+                continue
+            grid[y][x] = "#"
+            if symmetric:
+                mirror = face_center_g + (face_center_g - x)
+                if 0 <= mirror < cols:
+                    grid[y][mirror] = "#"
+
+    for eye in (left_eye, right_eye):
+        for dy in range(-1, 2):
+            for dx in range(-2, 3):
+                y = eye[1] + dy
+                x = eye[0] + dx
+                if 0 <= y < rows and 0 <= x < cols:
+                    grid[y][x] = " "
+        for dy, line in enumerate(["(   )", "(   )", "(   )"]):
+            for i, ch in enumerate(line):
+                y = eye[1] - 1 + dy
+                x = eye[0] - 2 + i
+                if 0 <= y < rows and 0 <= x < cols:
+                    grid[y][x] = ch
+
+    lines = ["".join(row).rstrip() for row in grid]
+    return lines, [{"x": left_eye[0], "y": eye_row}, {"x": right_eye[0], "y": eye_row}]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("image")
@@ -563,7 +658,7 @@ def main() -> None:
     parser.add_argument("--cols", type=int, default=52)
     parser.add_argument(
         "--style",
-        choices=["stylized", "photo", "outline", "refined", "portrait", "equalized"],
+        choices=["stylized", "photo", "outline", "refined", "portrait", "equalized", "hybrid"],
         default="stylized",
     )
     parser.add_argument("--outline", choices=["#", "+", "="], default="#")
@@ -586,6 +681,8 @@ def main() -> None:
         lines, eyes = render_portrait(image, meta, cols, rows, args.sym)
     elif args.style == "equalized":
         lines, eyes = render_equalized(image, meta, cols, rows, args.sym)
+    elif args.style == "hybrid":
+        lines, eyes = render_hybrid(image, meta, cols, rows, args.sym)
     else:
         lines, eyes = render_stylized(image, meta, cols, rows, args.sym)
 
